@@ -31,6 +31,10 @@ ls image_dir/*.jpg | sort > image_list
 | w | Select label white |
 | b | Select label black |
 
+## License
+
+MIT License
+
 ## Author
 
 Satoshi Shimada
