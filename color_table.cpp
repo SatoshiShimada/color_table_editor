@@ -51,6 +51,21 @@ void ColorTable::saveColorTable(std::string filename)
 void ColorTable::setColor(int y, int cb, int cr, int flag, int margin)
 {
 	const unsigned short object_type = 1 << flag;
+	const int y_start = std::max<int>(y - margin,   0);
+	const int y_end   = std::min<int>(y + margin, 255);
+	const int cb_start = std::max<int>(cb - margin,   0);
+	const int cb_end   = std::min<int>(cb + margin, 255);
+	const int cr_start = std::max<int>(cr - margin,   0);
+	const int cr_end   = std::min<int>(cr + margin, 255);
+	for(int yi = y_start; yi < y_end + 1; yi++) {
+		for(int cbi = cb_start; cbi < cb_end + 1; cbi++) {
+			for(int cri = cr_start; cri < cr_end + 1; cri++) {
+				table[getIndex(yi, cbi, cri)] |= object_type;
+			}
+		}
+	}
+	/*
+	const unsigned short object_type = 1 << flag;
 	int h, s, v;
 	cvtcolor::ycbcr2hsv(y, cb, cr, h, s, v);
 	const int s_start = std::max<int>(s - margin,   0);
@@ -65,10 +80,26 @@ void ColorTable::setColor(int y, int cb, int cr, int flag, int margin)
 		}
 	}
 	table[getIndex(y, cb, cr)] |= object_type;
+	*/
 }
 
 void ColorTable::clearColor(int y, int cb, int cr, int flag, int margin)
 {
+	const unsigned short object_type = 1 << flag;
+	const int y_start = std::max<int>(y - margin,   0);
+	const int y_end   = std::min<int>(y + margin, 255);
+	const int cb_start = std::max<int>(cb - margin,   0);
+	const int cb_end   = std::min<int>(cb + margin, 255);
+	const int cr_start = std::max<int>(cr - margin,   0);
+	const int cr_end   = std::min<int>(cr + margin, 255);
+	for(int yi = y_start; yi < y_end + 1; yi++) {
+		for(int cbi = cb_start; cbi < cb_end + 1; cbi++) {
+			for(int cri = cr_start; cri < cr_end + 1; cri++) {
+				table[getIndex(y, cbi, cri)] &= ~object_type;
+			}
+		}
+	}
+	/*
 	const unsigned short object_type = 1 << flag;
 	int h, s, v;
 	cvtcolor::ycbcr2hsv(y, cb, cr, h, s, v);
@@ -84,6 +115,7 @@ void ColorTable::clearColor(int y, int cb, int cr, int flag, int margin)
 		}
 	}
 	table[getIndex(y, cb, cr)] &= ~object_type;
+	*/
 }
 
 void ColorTable::resetColor(int flag)

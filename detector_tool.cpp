@@ -149,8 +149,12 @@ void showFieldEdge(cv::Mat &labeling_image, std::vector<int> &field_edge)
 {
 	const unsigned short color_yellow = 1 << COLOR_YELLOW;
 	for(int x = 0; x < labeling_image.cols; x++) {
-		const int edge_y = field_edge[x];
-		labeling_image.data[edge_y * labeling_image.cols + x] |= color_yellow;
+		const int margin = 2;
+		const int edge_ym = std::max<int>(field_edge[x] - margin, 0);
+		const int edge_yp = std::min<int>(field_edge[x] + margin, labeling_image.rows - 2);
+		for(int edge_y = edge_ym; edge_y < edge_yp + 1; edge_y++) {
+			labeling_image.data[edge_y * labeling_image.cols + x] |= color_yellow;
+		}
 	}
 }
 
