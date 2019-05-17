@@ -1,4 +1,6 @@
 mouse
 test
+color_table_editor
 *.jpg
 *.png
+*.cnf
