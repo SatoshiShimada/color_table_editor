@@ -16,6 +16,16 @@ make
 ls image_dir/*.jpg | sort > image_list
 ```
 
+Download a sample color table.  
+
+```shell
+wget https://github.com/SatoshiShimada/color_table_editor/files/3192322/x00.log https://github.com/SatoshiShimada/color_table_editor/files/3192323/x01.log https://github.com/SatoshiShimada/color_table_editor/files/3192324/x02.log https://github.com/SatoshiShimada/color_table_editor/files/3192325/x03.log; cat x00.log x01.log x02.log x03.log > color_table.cnf
+```
+
+Run application: `./color_table_editor`  
+
+Load color table by press the 'L' key.
+
 ### Key binds
 
 | Key | Function |
