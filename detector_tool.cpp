@@ -1,4 +1,8 @@
 #include <algorithm>
+#include <cmath>
+#include <utility>
+
+#include <iostream>
 
 #include "detector_tool.h"
 
@@ -65,12 +69,35 @@ void detectFieldEdge(cv::Mat &labeling_image, std::vector<int> &field_edge)
 	const unsigned short label_black = (1 << COLOR_BLACK);
 	for(int x = 0; x < width; x++) {
 		bool found_green = false;
-		constexpr int min_value = 20;
-		int max_value = min_value;
-		int max_value_index = height - 1;
-		int edge_score = 0;
+		constexpr double min_value = 20.0;
+		double max_value = min_value;
+		double max_value_index = height - 1;
+		double edge_score = 0.0;
+		int green_count = 0;
 		for(int y = height - 1; y >= 0; y--) {
 			unsigned short label = labeling_image.data[y * width + x];
+#if 1
+			if(!found_green) {
+				if(label & label_green) {
+					green_count++;
+					if(green_count >= 10) {
+						found_green = true;
+					}
+				}
+			} else {
+				if(label & label_green)
+					//edge_score += y / (height / 4) + 1;
+					edge_score += (static_cast<double>(y) / height + 1) * 4;
+				else if(label & label_white)
+					edge_score += -1;
+				else
+					edge_score += -2;
+				if(edge_score > max_value) {
+					max_value = edge_score;
+					max_value_index = y;
+				}
+			}
+#else
 			if(!found_green) {
 				if(label & label_green || label & label_black)
 					found_green = true;
@@ -86,10 +113,46 @@ void detectFieldEdge(cv::Mat &labeling_image, std::vector<int> &field_edge)
 					max_value_index = y;
 				}
 			}
+#endif
 		}
 		field_edge[x] = max_value_index;
 	}
 	medianFilter(field_edge);
+}
+
+std::vector<std::pair<int, int>> detectLineOfFieldEdge(std::vector<int> &field_edge)
+{
+	//std::cout << "gradient" << std::endl;
+	std::vector<std::pair<int, int>> edge_lines;
+	constexpr int x_step = 10;
+	double prev_gradient = (field_edge[0 + x_step] - field_edge[0]) / static_cast<double>(x_step);
+	int x_start = x_step;
+	bool continuous = false;
+	for(int x = x_step; x < field_edge.size() - x_step; x += x_step) {
+		int x_end = x + x_step;
+		const double gradient = (field_edge[x_end] - field_edge[x]) / static_cast<double>(x_step);
+		//std::cout << gradient << ", ";
+		constexpr double gradient_threshold = 1.0;
+		if(std::abs<double>(prev_gradient - gradient) < gradient_threshold) {
+			if(continuous == false) {
+				x_start = x_end;
+			}
+			continuous = true;
+		} else {
+			if(continuous) {
+				edge_lines.push_back(std::pair<int, int>(x_start, x_end));
+			}
+			continuous = false;
+		}
+		prev_gradient = gradient;
+	}
+	//std::cout << std::endl;
+	//std::cout << "detecting edge lines:" << std::endl;
+	//for(auto l : edge_lines) {
+		//std::cout << l.first << ", " << l.second << std::endl;
+	//}
+	//std::cout << "---" << std::endl;
+	return edge_lines;
 }
 
 void detectObstacle(std::vector<int> &field_edge, std::vector<object_pos> &objects)
@@ -154,6 +217,18 @@ void showFieldEdge(cv::Mat &labeling_image, std::vector<int> &field_edge)
 		const int edge_yp = std::min<int>(field_edge[x] + margin, labeling_image.rows - 2);
 		for(int edge_y = edge_ym; edge_y < edge_yp + 1; edge_y++) {
 			labeling_image.data[edge_y * labeling_image.cols + x] |= color_yellow;
+		}
+	}
+}
+
+void showLineOfFieldEdge(cv::Mat &labeling_image, std::vector<std::pair<int, int>> &lines)
+{
+	const unsigned short color_blue = 1 << COLOR_BLUE;
+	for(std::pair<int, int> line : lines) {
+		for(int x : {line.first, line.second}) {
+			for(int y = 0; y < labeling_image.rows; y++) {
+				labeling_image.data[y * labeling_image.cols + x] |= color_blue;
+			}
 		}
 	}
 }

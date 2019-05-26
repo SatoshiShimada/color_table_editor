@@ -14,6 +14,8 @@ namespace DetectorTool {
 	void detectFieldEdge(cv::Mat &, std::vector<int> &);
 	void detectObstacle(std::vector<int> &, std::vector<object_pos> &);
 	void showFieldEdge(cv::Mat &, std::vector<int> &);
+	std::vector<std::pair<int, int>> detectLineOfFieldEdge(std::vector<int> &field_edge);
+	void showLineOfFieldEdge(cv::Mat &labeling_image, std::vector<std::pair<int, int>> &lines);
 };
 
 #endif // DETECTOR_TOOL_H
