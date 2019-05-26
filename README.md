@@ -1,5 +1,7 @@
 # Color table editor
 
+![cap](https://user-images.githubusercontent.com/12107712/58381508-b8c44c00-7ff8-11e9-948c-fc2f4451e891.png)
+
 ## Installation
 
 ```shell
@@ -10,10 +12,10 @@ make
 
 ## Usage
 
-### Make image list
+Make image list
 
 ```shell
-ls image_dir/*.jpg | sort > image_list
+ls image_dir/*.jpg | xargs readlink -f | sort > image.list
 ```
 
 Download a sample color table.  
