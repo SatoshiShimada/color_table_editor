@@ -76,7 +76,7 @@ void detectFieldEdge(cv::Mat &labeling_image, std::vector<int> &field_edge)
 		int green_count = 0;
 		for(int y = height - 1; y >= 0; y--) {
 			unsigned short label = labeling_image.data[y * width + x];
-#if 1
+#if 0
 			if(!found_green) {
 				if(label & label_green) {
 					green_count++;

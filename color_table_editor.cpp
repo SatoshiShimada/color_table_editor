@@ -129,6 +129,10 @@ int main(int argc, char *argv[])
 
 	std::vector<std::string> img_names;
 	loadImageFileList(std::string("image.list"), img_names);
+	if(img_names.empty()) {
+		std::cerr << "no image files" << std::endl;
+		return 0;
+	}
 
 	mouseParam mouseEvent;
 
