@@ -66,28 +66,20 @@ void detectFieldEdge(cv::Mat &labeling_image, std::vector<int> &field_edge)
 	const int height = labeling_image.rows;
 	const unsigned short label_green = (1 << COLOR_GREEN);
 	const unsigned short label_white = (1 << COLOR_WHITE);// | (1 << COLOR_BALL);
-	const unsigned short label_black = (1 << COLOR_BLACK);
 	for(int x = 0; x < width; x++) {
 		bool found_green = false;
-		constexpr double min_value = 20.0;
-		double max_value = min_value;
-		double max_value_index = height - 1;
-		double edge_score = 0.0;
-		int green_count = 0;
+		constexpr int min_value = 20;
+		int max_value = min_value;
+		int max_value_index = height - 1;
+		int edge_score = 0;
 		for(int y = height - 1; y >= 0; y--) {
 			unsigned short label = labeling_image.data[y * width + x];
-#if 0
 			if(!found_green) {
-				if(label & label_green) {
-					green_count++;
-					if(green_count >= 10) {
-						found_green = true;
-					}
-				}
+				if(label & label_green)
+					found_green = true;
 			} else {
 				if(label & label_green)
-					//edge_score += y / (height / 4) + 1;
-					edge_score += (static_cast<double>(y) / height + 1) * 4;
+					edge_score += y / (height / 4) + 1;
 				else if(label & label_white)
 					edge_score += -1;
 				else
@@ -97,23 +89,6 @@ void detectFieldEdge(cv::Mat &labeling_image, std::vector<int> &field_edge)
 					max_value_index = y;
 				}
 			}
-#else
-			if(!found_green) {
-				if(label & label_green || label & label_black)
-					found_green = true;
-			} else {
-				if(label & label_green)
-					edge_score += y / (height / 4) + 1;
-				else if(label & label_white)
-					edge_score += +1;
-				else
-					edge_score += -2;
-				if(edge_score > max_value) {
-					max_value = edge_score;
-					max_value_index = y;
-				}
-			}
-#endif
 		}
 		field_edge[x] = max_value_index;
 	}
