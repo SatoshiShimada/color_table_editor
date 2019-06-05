@@ -15,7 +15,7 @@ make
 Make image list
 
 ```shell
-ls image_dir/*.jpg | xargs readlink -f | sort > image.list
+ls image_dir/*.jpg > image.list
 ```
 
 Download a sample color table.  
